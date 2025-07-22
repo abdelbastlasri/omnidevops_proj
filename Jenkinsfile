@@ -6,6 +6,14 @@ pipeline {
     }
 
     stages {
+        stage('Test Environment') {
+            steps {
+                bat 'python --version'
+                bat 'pip --version'
+                bat 'flake8 --version'
+                bat 'sonar-scanner -v'
+            }
+        }
         stage('Quality Gate Status Check') {
             steps {
                 withSonarQubeEnv('sonarserver') {
