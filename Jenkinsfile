@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        dockerContainer {
-            image 'python:3.11-slim'
-        }
-    }
+    agent any
 
     environment {
         SONARQUBE_ENV = 'sonarserver'
