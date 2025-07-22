@@ -1,4 +1,4 @@
-pipeline {   
+pipeline {     // start of Jenkinsfile for SonarQube Quality Gate Check --- IGNORE ---
     agent {
         docker {
             image 'python:3.11-slim'
@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Quality Gate Status Check') {
             steps {
-                withSonarQubeEnv('sonarserver') {
+                withSonarQubeEnv('sonarserver') {   //my sonarqube server on jenkins
                     sh '''
                         
                         pip install --upgrade pip
