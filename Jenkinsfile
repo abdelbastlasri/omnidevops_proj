@@ -1,4 +1,4 @@
-pipeline {   // Jenkinsfile for SonarQube Quality Gate Check
+pipeline {   
     agent {
         docker {
             image 'python:3.11-slim'
