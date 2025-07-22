@@ -1,13 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11-slim'
-        }
-    }
+    agent any
 
     environment {
         SONAR_HOST_URL = 'http://localhost:9000'
-        SONAR_LOGIN = 'squ_559817aba5867e5c8577aa87f1e64e8428acaf57'
+        SONAR_LOGIN = 'admin'
         SONAR_PROJECT_KEY = 'todolist-app'
     }
 
