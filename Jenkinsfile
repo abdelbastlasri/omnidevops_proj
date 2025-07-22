@@ -1,4 +1,4 @@
-pipeline {
+pipeline {   // Jenkinsfile for SonarQube Quality Gate Check
     agent {
         docker {
             image 'python:3.11-slim'
@@ -23,7 +23,6 @@ pipeline {
                         flake8 . || true
                         pytest || true
 
-                        
                         sonar-scanner \
                           -Dsonar.projectKey=todolist-app \
                           -Dsonar.sources=. \
@@ -31,8 +30,6 @@ pipeline {
                           -Dsonar.login=$SONAR_AUTH_TOKEN
                     '''
                 }
-
-                
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
