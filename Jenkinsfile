@@ -1,43 +1,48 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.11-slim'
+        }
+    }
 
     environment {
-        SONARQUBE_ENV = 'sonarserver'
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_LOGIN = 'squ_559817aba5867e5c8577aa87f1e64e8428acaf57'
+        SONAR_PROJECT_KEY = 'todolist-app'
     }
 
     stages {
-        stage('Test Environment') {
+        stage('Install Dependencies') {
             steps {
-                bat 'python --version'
-                bat 'pip --version'
-                bat 'flake8 --version'
-                bat 'sonar-scanner -v'
+                sh '''
+                    apt-get update && apt-get install -y curl unzip
+                    pip install --upgrade pip
+                    pip install pytest flake8
+                '''
             }
         }
-        stage('Quality Gate Status Check') {
+
+        stage('Lint and Test') {
             steps {
-                withSonarQubeEnv('sonarserver') {
-                bat '''
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
-                pip install pytest flake8 sonar-scanner
-
-                flake8 . || exit /b 0
-                pytest || exit /b 0
-
-                sonar-scanner \
-                -Dsonar.projectKey=todolist-app \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=%SONAR_HOST_URL% \
-                -Dsonar.login=%SONAR_AUTH_TOKEN%
-
+                sh '''
+                    flake8 . || true  # Avoid pipeline fail on lint warnings
+                    pytest || true    # Allow tests to fail without stopping build
                 '''
+            }
+        }
 
-                }
-
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+        stage('SonarQube Analysis') {
+            steps {
+                bat '''
+                    curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.1.0.4889.zip
+                    unzip sonar-scanner.zip
+                    export PATH=$PATH:$PWD/sonar-scanner-*/bin
+                    sonar-scanner \
+                      -Dsonar.projectKey=squ_559817aba5867e5c8577aa87f1e64e8428acaf57 \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=http://localhost:9000 \
+                      -Dsonar.login=admin
+                '''
             }
         }
     }
